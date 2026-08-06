@@ -1,0 +1,10 @@
+.env
+*.pem
+.aws/
+__pycache__/
+*.pyc
+venv/
+.terraform/
+*.tfstate
+*.tfstate.backup
+lambda.zip
