@@ -1,0 +1,1 @@
+{"statusCode": 200, "findingCount": 1, "findings": [{"type": "unattached_ebs_volume", "id": "vol-0b6f058e07b983bc3", "region": "us-east-1", "size_gb": 1, "created": "2026-08-06T08:48:17.391000+00:00", "detail": "1GB gp2 volume attached to nothing"}]}

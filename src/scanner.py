@@ -68,6 +68,19 @@ def scan_account(region="us-east-1"):
     return findings
 
 
+def handler(event, context):
+    """Entry point AWS Lambda calls."""
+    findings = scan_account()
+    print(f"Scan complete — {len(findings)} finding(s)")
+    for f in findings:
+        print(f"  [{f['type']}] {f['id']} — {f['detail']}")
+    return {
+        "statusCode": 200,
+        "findingCount": len(findings),
+        "findings": findings,
+    }
+
+
 if __name__ == "__main__":
     results = scan_account()
     print(f"\n🔍 Scan complete — {len(results)} finding(s)\n")
