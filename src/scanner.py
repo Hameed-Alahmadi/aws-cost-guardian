@@ -74,14 +74,21 @@ def handler(event, context):
     from pricing import price_findings
     from spend import last_30_days_spend
     from notify import build_report, send_report
+    from storage import save_scan, recent_scans
 
     findings = scan_account()
     findings, total_waste = price_findings(findings)
     actual_spend = last_30_days_spend()
 
-    report = build_report(findings, total_waste, actual_spend)
+    # what did the previous scan say? (for the trend line)
+    # NOTE: read history BEFORE save_scan below, or you'd compare against yourself
+    history = recent_scans(days=2)
+    previous_waste = history[0].get("monthly_waste_usd") if history else None
+
+    report = build_report(findings, total_waste, actual_spend, previous_waste)
     print(report)
 
+    save_scan(findings, total_waste, actual_spend)
     send_report(
         subject=f"AWS Cost Guardian — {len(findings)} findings, ${total_waste}/mo",
         body=report,
@@ -91,7 +98,6 @@ def handler(event, context):
         "statusCode": 200,
         "findingCount": len(findings),
         "monthlyWasteUsd": total_waste,
-        "last30DaysSpendUsd": actual_spend,
         "findings": findings,
     }
 

@@ -4,8 +4,7 @@ import os
 import boto3
 
 
-def build_report(findings, total_waste, actual_spend):
-    """Turn findings into a human-readable email body."""
+def build_report(findings, total_waste, actual_spend, previous_waste=None):
     if not findings:
         return "✅ AWS Cost Guardian\n\nNo waste found — your account is clean!"
 
@@ -15,10 +14,14 @@ def build_report(findings, total_waste, actual_spend):
         f"Findings:        {len(findings)}",
         f"Monthly waste:   ${total_waste}",
         f"Last 30d spend:  ${actual_spend}",
-        "",
-        "Details:",
     ]
-    # most expensive first — that's what people act on
+
+    if previous_waste is not None:
+        diff = round(total_waste - float(previous_waste), 2)
+        arrow = "🔺 up" if diff > 0 else ("🔻 down" if diff < 0 else "➡️ flat")
+        lines.append(f"Trend:           {arrow} ${abs(diff)} since last scan")
+
+    lines += ["", "Details:"]
     for f in sorted(findings, key=lambda x: x.get("monthly_cost_usd", 0), reverse=True):
         lines.append(
             f"  • ${f.get('monthly_cost_usd', 0):>7.2f}/mo  "

@@ -40,6 +40,12 @@ data "aws_iam_policy_document" "scanner" {
     actions   = ["sns:Publish"]
     resources = [aws_sns_topic.reports.arn]
   }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["dynamodb:PutItem", "dynamodb:Query"]
+    resources = [aws_dynamodb_table.findings.arn]
+  }
 }
 
 resource "aws_iam_role_policy" "scanner" {
