@@ -16,6 +16,7 @@ def find_unattached_volumes(ec2):
             "id": vol["VolumeId"],
             "region": ec2.meta.region_name,
             "size_gb": vol["Size"],
+            "volume_type": vol["VolumeType"],
             "created": vol["CreateTime"].isoformat(),
             "detail": f"{vol['Size']}GB {vol['VolumeType']} volume attached to nothing",
         })
@@ -70,13 +71,22 @@ def scan_account(region="us-east-1"):
 
 def handler(event, context):
     """Entry point AWS Lambda calls."""
+    from pricing import price_findings
+    from spend import last_30_days_spend
+
     findings = scan_account()
-    print(f"Scan complete — {len(findings)} finding(s)")
+    findings, total_waste = price_findings(findings)
+    actual_spend = last_30_days_spend()
+
+    print(f"Scan complete — {len(findings)} finding(s), ${total_waste}/month wasted")
     for f in findings:
-        print(f"  [{f['type']}] {f['id']} — {f['detail']}")
+        print(f"  [{f['type']}] {f['id']} — ${f['monthly_cost_usd']}/mo — {f['detail']}")
+
     return {
         "statusCode": 200,
         "findingCount": len(findings),
+        "monthlyWasteUsd": total_waste,
+        "last30DaysSpendUsd": actual_spend,
         "findings": findings,
     }
 
@@ -88,3 +98,4 @@ if __name__ == "__main__":
         print(f"  [{f['type']}] {f['id']} — {f['detail']}")
     if not results:
         print("  ✅ No waste found. Your account is clean!")
+

@@ -24,6 +24,7 @@ data "aws_iam_policy_document" "scanner" {
       "ec2:DescribeSnapshots",
       "ec2:DescribeInstances",
       "sts:GetCallerIdentity",
+      "ce:GetCostAndUsage", 
     ]
     resources = ["*"]      # describe calls can't be scoped to specific ARNs
   }
