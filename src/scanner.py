@@ -73,14 +73,19 @@ def handler(event, context):
     """Entry point AWS Lambda calls."""
     from pricing import price_findings
     from spend import last_30_days_spend
+    from notify import build_report, send_report
 
     findings = scan_account()
     findings, total_waste = price_findings(findings)
     actual_spend = last_30_days_spend()
 
-    print(f"Scan complete — {len(findings)} finding(s), ${total_waste}/month wasted")
-    for f in findings:
-        print(f"  [{f['type']}] {f['id']} — ${f['monthly_cost_usd']}/mo — {f['detail']}")
+    report = build_report(findings, total_waste, actual_spend)
+    print(report)
+
+    send_report(
+        subject=f"AWS Cost Guardian — {len(findings)} findings, ${total_waste}/mo",
+        body=report,
+    )
 
     return {
         "statusCode": 200,

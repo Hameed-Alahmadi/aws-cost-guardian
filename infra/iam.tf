@@ -24,15 +24,21 @@ data "aws_iam_policy_document" "scanner" {
       "ec2:DescribeSnapshots",
       "ec2:DescribeInstances",
       "sts:GetCallerIdentity",
-      "ce:GetCostAndUsage", 
+      "ce:GetCostAndUsage",
     ]
-    resources = ["*"]      # describe calls can't be scoped to specific ARNs
+    resources = ["*"] # describe calls can't be scoped to specific ARNs
   }
 
   statement {
     effect    = "Allow"
     actions   = ["logs:CreateLogStream", "logs:PutLogEvents"]
     resources = ["${aws_cloudwatch_log_group.lambda.arn}:*"]
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["sns:Publish"]
+    resources = [aws_sns_topic.reports.arn]
   }
 }
 
