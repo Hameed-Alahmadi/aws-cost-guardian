@@ -1,4 +1,11 @@
 terraform {
+  backend "s3" {
+    bucket       = "cost-guardian-tfstate-771413672021"
+    key          = "cost-guardian/terraform.tfstate"
+    region       = "us-east-1"
+    use_lockfile = true
+  }
+
   required_providers {
     aws     = { source = "hashicorp/aws", version = "~> 5.0" }
     archive = { source = "hashicorp/archive", version = "~> 2.4" }
