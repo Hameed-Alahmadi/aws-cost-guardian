@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 permissions:
-  id-token: write      # REQUIRED for OIDC
+  id-token: write     # REQUIRED for OIDC
   contents: read
 
 jobs:
