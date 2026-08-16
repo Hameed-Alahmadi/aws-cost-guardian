@@ -14,17 +14,6 @@ SNAPSHOT_PRICE_PER_GB_MONTH = 0.05
 UNASSOCIATED_EIP_MONTHLY = 3.60
 
 
-def _to_decimal(obj):
-    """Recursively convert floats to Decimal for DynamoDB."""
-    if isinstance(obj, float):
-        return Decimal(str(obj))
-    if isinstance(obj, list):
-        return [_to_decimal(x) for x in obj]
-    if isinstance(obj, dict):
-        return {k: _to_decimal(v) for k, v in obj.items()}
-    return obj
-
-
 def estimate_monthly_cost(finding):
     """Return the estimated USD/month this wasted resource is costing."""
     kind = finding["type"]
