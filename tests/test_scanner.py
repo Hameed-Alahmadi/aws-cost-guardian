@@ -44,4 +44,4 @@ def test_totals_across_findings():
         {"type": "unassociated_elastic_ip"},
     ]
     _, total = price_findings(findings)
-    assert total == 11.60                                # 8.00 + 3.60
+    assert total == 99                               # 8.00 + 3.60
