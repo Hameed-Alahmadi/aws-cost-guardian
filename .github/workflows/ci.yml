@@ -25,11 +25,20 @@ jobs:
   # ---- JOB 2: deploy the real infrastructure ----
   deploy:
     needs: test                              # only if tests passed
+    if: github.ref == 'refs/heads/main'      
     # only on main, not PRs
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:                             # explicit at job level
+      id-token: write                        # REQUIRED for OIDC
+      contents: read
     steps:
       - uses: actions/checkout@v4
+
+      - name: Debug OIDC identity
+        run: |
+          echo "repository : ${{ github.repository }}"
+          echo "ref        : ${{ github.ref }}"
+          echo "expected   : repo:${{ github.repository }}:ref:${{ github.ref }}"
 
       - name: Get short-lived AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
