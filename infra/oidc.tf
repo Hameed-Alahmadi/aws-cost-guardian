@@ -1,6 +1,11 @@
 variable "github_repo" {
-  description = "owner/repo allowed to deploy, e.g. hameed/aws-cost-guardian"
+  description = "owner/repo allowed to deploy, e.g. Hameed-Alahmadi/aws-cost-guardian"
   type        = string
+}
+
+locals {
+  repo_owner = split("/", var.github_repo)[0]
+  repo_name  = split("/", var.github_repo)[1]
 }
 
 # Tell AWS to trust GitHub's identity provider
@@ -26,7 +31,12 @@ data "aws_iam_policy_document" "gha_assume" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_repo}:*"]     # only this repo
+      values = [
+        # classic claim format
+        "repo:${var.github_repo}:*",
+        # ID-augmented format: repo:owner@<user-id>/name@<repo-id>:...
+        "repo:${local.repo_owner}@*/${local.repo_name}@*:*",
+      ]
     }
   }
 }
