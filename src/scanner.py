@@ -75,25 +75,33 @@ def handler(event, context):
     from spend import last_30_days_spend
     from notify import build_report, send_report
     from storage import save_scan, recent_scans
+    from metrics import log_event, emit_metrics
+
+    log_event("scan_started")
 
     findings = scan_account()
     findings, total_waste = price_findings(findings)
     actual_spend = last_30_days_spend()
 
-    # what did the previous scan say? (for the trend line)
-    # NOTE: read history BEFORE save_scan below, or you'd compare against yourself
+    log_event(
+        "scan_complete",
+        finding_count=len(findings),
+        monthly_waste_usd=total_waste,
+        last_30d_spend_usd=actual_spend,
+    )
+    emit_metrics(len(findings), total_waste)
+
     history = recent_scans(days=2)
     previous_waste = history[0].get("monthly_waste_usd") if history else None
 
     report = build_report(findings, total_waste, actual_spend, previous_waste)
-    print(report)
-
     save_scan(findings, total_waste, actual_spend)
     send_report(
         subject=f"AWS Cost Guardian — {len(findings)} findings, ${total_waste}/mo",
         body=report,
     )
 
+    log_event("report_sent")
     return {
         "statusCode": 200,
         "findingCount": len(findings),

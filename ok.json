@@ -1,0 +1,1 @@
+{"statusCode": 200, "findingCount": 1, "monthlyWasteUsd": 2.0, "findings": [{"type": "unattached_ebs_volume", "id": "vol-0dc3752d315d6e113", "region": "us-east-1", "size_gb": 20, "volume_type": "gp2", "created": "2026-08-16T17:35:33.695000+00:00", "detail": "20GB gp2 volume attached to nothing", "monthly_cost_usd": 2.0}]}
