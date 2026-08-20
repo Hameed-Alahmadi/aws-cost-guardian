@@ -40,7 +40,10 @@ resource "aws_cloudwatch_dashboard" "main" {
           title  = "Monthly waste found (USD)"
           region = "us-east-1"
           metrics = [["CostGuardian", "MonthlyWasteUsd"]]
-          view   = "timeSeries"
+          view    = "singleValue"
+          sparkline = true
+          stat    = "Maximum"
+          yAxis = { left = { min = 0 } }
         }
       },
       {
@@ -50,6 +53,7 @@ resource "aws_cloudwatch_dashboard" "main" {
           region = "us-east-1"
           metrics = [["CostGuardian", "FindingCount"]]
           view   = "timeSeries"
+          yAxis = { left = { min = 0 } }
         }
       },
       {
@@ -58,11 +62,19 @@ resource "aws_cloudwatch_dashboard" "main" {
           title  = "Scanner health"
           region = "us-east-1"
           metrics = [
-            ["AWS/Lambda", "Invocations", "FunctionName", aws_lambda_function.scanner.function_name],
-            [".", "Errors", ".", "."],
-            [".", "Duration", ".", "."]
+            ["AWS/Lambda", "Invocations", "FunctionName", aws_lambda_function.scanner.function_name,
+              { yAxis = "left", stat = "Sum", label = "Invocations" }],
+            [".", "Errors", ".", ".",
+              { yAxis = "left", stat = "Sum", label = "Errors" }],
+            [".", "Duration", ".", ".",
+              { yAxis = "right", stat = "Average", label = "Duration (ms)" }]
           ]
-          view = "timeSeries"
+          view   = "timeSeries"
+          period = 300
+          yAxis = {
+            left  = { label = "Count", min = 0 }
+            right = { label = "ms",    min = 0 }
+          }
         }
       }
     ]
