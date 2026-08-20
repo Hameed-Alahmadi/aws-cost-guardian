@@ -18,7 +18,7 @@ def last_30_days_spend():
         total = sum(
             float(r["Total"]["UnblendedCost"]["Amount"]) for r in resp["ResultsByTime"]
         )
-        return round(total, 2)
+        return max(0.0, round(total, 2))
     except Exception as e:      # Cost Explorer not enabled yet, or no permission
         print(f"Cost Explorer unavailable: {e}")
         return 0.0

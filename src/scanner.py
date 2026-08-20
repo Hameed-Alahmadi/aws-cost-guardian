@@ -97,7 +97,7 @@ def handler(event, context):
     report = build_report(findings, total_waste, actual_spend, previous_waste)
     save_scan(findings, total_waste, actual_spend)
     send_report(
-        subject=f"AWS Cost Guardian — {len(findings)} findings, ${total_waste}/mo",
+        subject=f"AWS Cost Guardian — {len(findings)} finding{'s' if len(findings) != 1 else ''}, ${total_waste}/mo",
         body=report,
     )
 
